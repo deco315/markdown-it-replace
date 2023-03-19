@@ -6,6 +6,7 @@ export default function renderer(): RenderRule {
   return function (tokens: Token[], idx: number) {
     const token = tokens[idx]
     const word = token.content
+        
     const applyRule = token.meta.rule
 
     return applyRule(word)
