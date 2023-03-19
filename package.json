@@ -1,0 +1,15 @@
+{
+  "name": "markdown-it-replace",
+  "version": "0.0.1-alpha",
+  "description": "this plugin lets you replace all occurencies of given words with html",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/markdown-it": "^12.2.3",
+    "typescript": "^5.0.2"
+  }
+}

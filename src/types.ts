@@ -1,0 +1,16 @@
+export type Pattern = string | string[] | RegExp
+
+export type RenderFunction = (word: string) => string
+
+export interface Rule{
+  pattern: Pattern
+  rule: RenderFunction
+}
+
+export interface Word {
+  content: string
+  position: {
+    start: number
+    end: number
+  }
+}
