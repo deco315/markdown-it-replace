@@ -17,6 +17,7 @@ export default function tokenizer(md: MarkdownIt, options: { rules : Rule[] }) {
         continue
       }
 
+      // mark the word to replace on render stage
       markWordForReplacement(state, word, rule)
 
       state.pos = state.src.length
@@ -52,10 +53,8 @@ function tokenizeSubstring(state: StateInline, str: string) {
 }
 
 /**
- * Find all words with corresponding positions in the state
- * @param pattern 
- * @param str 
- * @returns 
+ * Find the first occurrence of the pattern.
+ * Return its content with corresponding start and end positions in the state
  */
 function findWord(pattern: RegExp | string | string[], str: string): Word | null {
   if (pattern instanceof RegExp) {
