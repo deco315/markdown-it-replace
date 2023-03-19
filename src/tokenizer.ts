@@ -1,4 +1,4 @@
-import type { RenderFunction, Rule, Word } from './types'
+import type { Pattern, RenderFunction, Rule, Word } from './types'
 import type MarkdownIt from 'markdown-it'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
 
@@ -56,7 +56,7 @@ function tokenizeSubstring(state: StateInline, str: string) {
  * Find the first occurrence of the pattern.
  * Return its content with corresponding start and end positions in the state
  */
-function findWord(pattern: RegExp | string | string[], str: string): Word | null {
+function findWord(pattern: Pattern, str: string): Word | null {
   if (pattern instanceof RegExp) {
     if (!pattern.source.startsWith('^')) {
       throw new Error(`markdown-it ${PLUGIN_ID} plugin error: regular expression pattern MUST start with ^`)
