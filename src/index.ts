@@ -9,7 +9,10 @@ export default function characterReplacerPlugin() {
   const rules = [] as Rule[]
 
   function initializePlugin(md: MarkdownIt) {
+    // first: convert text into tokens
     md.inline.ruler.before('text', PLUGIN_ID, tokenizer(md, { rules }))
+
+    // second: render these tokens into html
     md.renderer.rules[PLUGIN_ID] = renderer()
   }
 
