@@ -1,10 +1,10 @@
 {
   "name": "markdown-it-replace",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "this plugin lets you replace all occurencies of given words with anything you want including html",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["lib/**/*"],
+  "files": ["src/**/*", "lib/**/*"],
   "scripts": {
     "build": "tsc",
     "test": "tsc && jest"

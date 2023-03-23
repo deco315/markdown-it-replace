@@ -12,7 +12,12 @@ export default function tokenizer(md: MarkdownIt, options: { rules : Rule[] }) {
     const str = state.src.slice(start)
 
     for (const { pattern, rule } of rules) {
+      if (state.pending) {
+        continue
+      }
+      
       const word = findWord(pattern, str)
+      
       if (!word) {
         continue
       }
@@ -31,7 +36,10 @@ export default function tokenizer(md: MarkdownIt, options: { rules : Rule[] }) {
 function markWordForReplacement(state: StateInline, word: Word, rule: RenderFunction) {
   // prefix text
   if (word.position.start > 0) {
-    tokenizeSubstring(state, state.src.slice(0, word.position.start))
+    const token = state.push('text', '', 0);
+    token.content = state.src.slice(0, word.position.start)
+    token.level = state.level
+    //tokenizeSubstring(state, state.src.slice(0, word.position.start))
   }
 
   // special token. Will be replaced on render stage (renderer.ts)
@@ -41,9 +49,9 @@ function markWordForReplacement(state: StateInline, word: Word, rule: RenderFunc
   token.level = state.level
 
   // suffix text
-  if (word.position.end < state.src.length) {
+  if (word.position.end < state.src.length) {    
     tokenizeSubstring(state, state.src.slice(word.position.end))
-  }
+  }  
 }
 
 function tokenizeSubstring(state: StateInline, str: string) {
@@ -58,10 +66,6 @@ function tokenizeSubstring(state: StateInline, str: string) {
  */
 function findWord(pattern: Pattern, str: string): Word | null {
   if (pattern instanceof RegExp) {
-    if (!pattern.source.startsWith('^')) {
-      throw new Error(`markdown-it ${PLUGIN_ID} plugin error: regular expression pattern MUST start with ^`)
-    }
-
     const res = str.match(pattern)
     if (!res) {
       return null
