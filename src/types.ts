@@ -4,7 +4,7 @@ export type RenderFunction = (word: string) => string
 
 export interface Rule{
   pattern: Pattern
-  rule: RenderFunction
+  transform: RenderFunction
 }
 
 export interface Word {
@@ -12,5 +12,6 @@ export interface Word {
   position: {
     start: number
     end: number
-  }
+  },
+  transform: RenderFunction
 }

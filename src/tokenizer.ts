@@ -11,29 +11,25 @@ export default function tokenizer(md: MarkdownIt, options: { rules : Rule[] }) {
     const start = state.pos
     const str = state.src.slice(start)
 
-    for (const { pattern, rule } of rules) {
-      if (state.pending) {
-        continue
-      }
-      
-      const word = findWord(pattern, str)
-      
-      if (!word) {
-        continue
-      }
-
-      // mark the word to replace on render stage
-      markWordForReplacement(state, word, rule)
-
-      state.pos = state.src.length
-      return true
+    if (state.pending) {
+      return false
+    }
+    
+    const word = findWord(rules, str)
+    
+    if (!word) {
+      return false
     }
 
-    return false
+    // mark the word to replace on render stage
+    markWordForReplacement(state, word)
+
+    state.pos = state.src.length
+    return true
   }
 }
 
-function markWordForReplacement(state: StateInline, word: Word, rule: RenderFunction) {
+function markWordForReplacement(state: StateInline, word: Word) {
   // prefix text
   if (word.position.start > 0) {
     const token = state.push('text', '', 0);
@@ -45,7 +41,7 @@ function markWordForReplacement(state: StateInline, word: Word, rule: RenderFunc
   // special token. Will be replaced on render stage (renderer.ts)
   const token = state.push(PLUGIN_ID, '', 0);
   token.content = word.content
-  token.meta = { rule }
+  token.meta = { transform: word.transform }
   token.level = state.level
 
   // suffix text
@@ -64,36 +60,68 @@ function tokenizeSubstring(state: StateInline, str: string) {
  * Find the first occurrence of the pattern.
  * Return its content with corresponding start and end positions in the state
  */
-function findWord(pattern: Pattern, str: string): Word | null {
-  if (pattern instanceof RegExp) {
-    const res = str.match(pattern)
-    if (!res) {
-      return null
+function findWord(rules: Rule[], str: string): Word | null {
+  let resultCandidates: Word[] = []
+
+  for (const rule of rules) {
+    const pattern = rule.pattern
+
+    if (pattern instanceof RegExp) {
+      const res = str.match(pattern)
+      if (!res) {
+        continue
+      }
+
+      const foundWord = res[1] || res[0] || ''
+
+      resultCandidates.push({
+        content: foundWord,
+        position: {
+          start: res.index || 0,
+          end: (res.index || 0) + foundWord.length
+        },
+        transform: rule.transform
+      })
     }
 
-    const foundWord = res[1] || res[0] || ''
+    if (Array.isArray(pattern)) {
+      for (const word of pattern) {
+        const found = findWordString(word, str)
+        
+        if (found) {
+          resultCandidates.push({
+            ...found,
+            transform: rule.transform
+          })
+        }
+      }
+      continue
+    }
 
-    return {
-      content: foundWord,
-      position: {
-        start: res.index || 0,
-        end: (res.index || 0) + foundWord.length
+    if (typeof pattern === 'string') {
+      const word = findWordString(pattern, str)
+      if (word) {
+        resultCandidates.push({
+          ...word,
+          transform: rule.transform
+        })
       }
     }
   }
 
-  if (Array.isArray(pattern)) {
-    for (const word of pattern) {
-      const found = findWordString(word, str)
-      
-      if (found) {
-        return found
-      }
-    }
-    return null
-  } 
+  let result = resultCandidates.pop()
 
-  return findWordString(pattern, str)
+  if (!result || resultCandidates.length === 0) {
+    return result || null
+  }
+
+  for (const rc of resultCandidates) {
+    if (rc.position.start < result.position.start) {
+      result = rc
+    }
+  }
+
+  return result
 }
 
 function findWordString(search: string, str: string) {

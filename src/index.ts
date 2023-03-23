@@ -16,10 +16,10 @@ export default function characterReplacerPlugin() {
     md.renderer.rules[PLUGIN_ID] = renderer()
   }
 
-  initializePlugin.addRule = function (pattern: Pattern, rule: RenderFunction) {
+  initializePlugin.addRule = function (pattern: Pattern, transform: RenderFunction) {
     rules.push({
       pattern: checkPattern(pattern),
-      rule
+      transform
     })
     return this
   }

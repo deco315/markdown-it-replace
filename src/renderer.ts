@@ -7,8 +7,8 @@ export default function renderer(): RenderRule {
     const token = tokens[idx]
 
     const word = token.content
-    const applyRule = token.meta.rule
+    const transform = token.meta.transform
 
-    return applyRule(word)
+    return transform(word)
   }
 }
