@@ -1,6 +1,13 @@
 const MarkdownIt = require('markdown-it')
 const replacerPlugin = require('../lib').default
 
+function bold() {
+  return function(content) {
+    return `<b>${content}</b>`
+  }
+}
+
+
 describe('the one and only test suite', () => {
   // replaces if search is a regular string
   it('replaces if search is a regular string', () => {
@@ -31,7 +38,7 @@ describe('the one and only test suite', () => {
     const md = MarkdownIt()
       .use(
         replacerPlugin()
-          .addRule(/^\s*(.{1,20}):/, word => word.toLowerCase())
+          .addRule(/^\s*(.{1,20}):/m, word => word.toLowerCase())
       )
 
     const result = md.render('BERNARDO: Who\'s there?').trim()
@@ -74,4 +81,28 @@ describe('the one and only test suite', () => {
     const result = md.render('FRANCISCO: I think I hear them. Stand, ho! Who\'s there?').trim()
     expect(result).toEqual('<p>FRANCiSCO: i [CENSORED] i [CENSORED] them. Stand, ho! Who\'s there?</p>')
   })
+
+  //
+  it('renders multiline content correctly', () => {
+    const md = MarkdownIt()
+      .use(
+        replacerPlugin()
+          .addRule(/^\s*([^:]{1,20}):/m, bold())
+      )
+
+      const result = md.render(
+`Bernardo: Who's there?
+Francisco: Nay, answer me: stand, and unfold yourself.
+Bernardo: Long live the king! Francisco: Bernardo?`
+)
+console.log(result);
+      expect(result).toEqual(
+`<p><b>Bernardo</b>: Who's there?
+<b>Francisco</b>: Nay, answer me: stand, and unfold yourself.
+<b>Bernardo</b>: Long live the king! Francisco: Bernardo?</p>
+`
+    )
+  })
+
+  // add test for regexp not at the beginning of line
 })

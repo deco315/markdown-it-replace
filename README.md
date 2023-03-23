@@ -5,3 +5,5 @@ This plugin lets you replace all occurencies of given words with anything you wa
 ## Documentation
 
 WIP
+
+The plugin enforces you to use multiline regular expressions.

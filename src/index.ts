@@ -17,9 +17,22 @@ export default function characterReplacerPlugin() {
   }
 
   initializePlugin.addRule = function (pattern: Pattern, rule: RenderFunction) {
-    rules.push({ pattern, rule })
+    rules.push({
+      pattern: checkPattern(pattern),
+      rule
+    })
     return this
   }
 
   return initializePlugin
 };
+
+function checkPattern(pattern: Pattern): Pattern {
+  if (pattern instanceof RegExp) {
+    if (!pattern.multiline) {
+      return new RegExp(pattern.source, pattern.flags + 'm')
+    }
+  }
+
+  return pattern
+}
