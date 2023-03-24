@@ -4,10 +4,13 @@
   "description": "this plugin lets you replace all occurencies of given words with anything you want including html",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "files": ["src/**/*", "lib/**/*"],
+  "files": [
+    "src/**/*",
+    "lib/**/*"
+  ],
   "scripts": {
-    "build": "tsc",
-    "test": "tsc && jest"
+    "build": "shx rm -rf ./lib && tsc",
+    "test": "shx rm -rf ./lib && tsc && jest"
   },
   "author": "deco313",
   "license": "MIT",
@@ -15,6 +18,7 @@
     "@types/markdown-it": "^12.2.3",
     "jest": "^29.5.0",
     "markdown-it": "^13.0.1",
+    "shx": "^0.3.4",
     "typescript": "^5.0.2"
   }
 }
