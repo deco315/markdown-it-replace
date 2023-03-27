@@ -1,10 +1,8 @@
 const MarkdownIt = require('markdown-it')
 const replacerPlugin = require('../lib').default
 
-function bold() {
-  return function(content) {
-    return `<b>${content}</b>`
-  }
+function bold(content) {
+  return `<b>${content}</b>`
 }
 
 
@@ -87,7 +85,7 @@ describe('the one and only test suite', () => {
     const md = MarkdownIt()
       .use(
         replacerPlugin()
-          .addRule(/^\s*([^:]{1,20}):/m, bold())
+          .addRule(/^\s*([^:]{1,20}):/m, bold)
       )
 
       const result = md.render(
@@ -104,5 +102,40 @@ console.log(result);
     )
   })
 
-  // add test for regexp not at the beginning of line
+  //
+  it('renders correctly with regexp parentheses', () => {
+    const md = MarkdownIt()
+      .use(
+        replacerPlugin()
+          .addRule(/\D(\d+)/m, bold)
+      )
+
+      const result = md.render('1984 was published on 8 June 1949 by Secker & Warburg')
+
+      expect(result).toEqual('<p>1984 was published on <b>8</b> June <b>1949</b> by Secker &amp; Warburg</p>\n')
+  })
+
+  //
+  it('applies the rules in the correct order', () => {
+    const md = MarkdownIt()
+      .use(
+        replacerPlugin()
+          .addRule(/^(.+) \[.+\]:/, bold)
+          .addRule(/^(.+):/, bold)
+      )
+
+      const result = md.render(
+      `Ghost [Beneath]: Swear.
+
+HAMLET: Rest, rest, perturbed spirit!
+
+_They swear_`)
+
+      expect(result).toEqual(
+`<p><b>Ghost</b><b> [Beneath]</b>: Swear.</p>
+<p><b>HAMLET</b>: Rest, rest, perturbed spirit!</p>
+<p><em>They swear</em></p>
+`
+      )
+  })
 })
