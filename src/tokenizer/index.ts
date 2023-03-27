@@ -24,6 +24,7 @@ export default function tokenizer(md: MarkdownIt, options: { rules : Rule[] }) {
 
 function markWordForReplacement(state: StateInline, word: Word) {
   // prefix text
+  // TODO: tokenize prefix also. Set state.maxPos
   if (word.position.start > 0) {
     const token = state.push('text', '', 0);
     token.content = state.src.slice(0, word.position.start)
