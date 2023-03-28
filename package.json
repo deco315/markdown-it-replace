@@ -1,6 +1,6 @@
 {
-  "name": "markdown-it-replace",
-  "version": "1.0.1",
+  "name": "@deco313/markdown-it-replace",
+  "version": "1.1.0",
   "description": "this plugin lets you replace all occurencies of given words with anything you want including html",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,5 +20,20 @@
     "markdown-it": "^13.0.1",
     "shx": "^0.3.4",
     "typescript": "^5.0.2"
-  }
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deco315/markdown-it-replace.git"
+  },
+  "keywords": [
+    "markdown-it-plugin"
+  ],
+  "bugs": {
+    "url": "https://github.com/deco315/markdown-it-replace/issues"
+  },
+  "homepage": "https://github.com/deco315/markdown-it-replace#readme"
 }
