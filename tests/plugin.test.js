@@ -5,6 +5,10 @@ function bold(content) {
   return `<b>${content}</b>`
 }
 
+function emphasis(content) {
+  return `<em>${content}</em>`
+}
+
 
 describe('the one and only test suite', () => {
   // replaces if search is a regular string
@@ -90,14 +94,16 @@ describe('the one and only test suite', () => {
 
       const result = md.render(
 `Bernardo: Who's there?
+
 Francisco: Nay, answer me: stand, and unfold yourself.
+
 Bernardo: Long live the king! Francisco: Bernardo?`
 )
 console.log(result);
       expect(result).toEqual(
-`<p><b>Bernardo</b>: Who's there?
-<b>Francisco</b>: Nay, answer me: stand, and unfold yourself.
-<b>Bernardo</b>: Long live the king! Francisco: Bernardo?</p>
+`<p><b>Bernardo</b>: Who's there?</p>
+<p><b>Francisco</b>: Nay, answer me: stand, and unfold yourself.</p>
+<p><b>Bernardo</b>: Long live the king! Francisco: Bernardo?</p>
 `
     )
   })
@@ -140,6 +146,30 @@ console.log(result);
       const result = md.render('**1984** was *published* on **8 June 1949** by Secker & Warburg')
 
       expect(result).toEqual('<p><strong><b>1984</b></strong> was <em>published</em> on <strong><b>8</b> June <b>1949</b></strong> by Secker & Warburg</p>\n')
+  })
+
+  //
+  it('correctly match regexp with start (^) and end ($) anchors', () => {
+    const md = MarkdownIt()
+      .use(
+        replacerPlugin()
+          .addRule(/^\d+/m, bold)
+          .addRule(/\d+$/m, emphasis)
+      )
+
+      const result = md.render(
+        `**1984** was *published* on **8 June 1949** by Secker & Warburg 2
+
+13test6
+
+test 23 4`
+      )
+
+      expect(result).toEqual(
+`<p><strong><b>1984</b></strong> was <em>published</em> on <strong>8 June 1949</strong> by Secker & Warburg <em>2</em></p>
+<p><b>13</b>test<em>6</em></p>
+<p>test 23 <em>4</em></p>
+`)
   })
 
   //
