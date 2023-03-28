@@ -21,13 +21,17 @@ export function findAll(rules: Rule[], str: string): string[] {
 
   const word = findWord(rules, str)
   if (!word) {
-    result.push(str)
+    result.push(escapeHtml(str))
     return result
   }
 
-  result.push(str.slice(0, word.position.start))
-  result.push(word.transform(word.content))
+  result.push(escapeHtml(str.slice(0, word.position.start)))
+  result.push(word.transform(escapeHtml(word.content)))
   result.push(...findAll(rules, str.slice(word.position.end)))
 
   return result
+}
+
+function escapeHtml(str: string): string {
+  return str.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
