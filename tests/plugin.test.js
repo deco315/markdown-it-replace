@@ -112,7 +112,34 @@ console.log(result);
 
       const result = md.render('1984 was published on 8 June 1949 by Secker & Warburg')
 
-      expect(result).toEqual('<p>1984 was published on <b>8</b> June <b>1949</b> by Secker &amp; Warburg</p>\n')
+      expect(result).toEqual('<p>1984 was published on <b>8</b> June <b>1949</b> by Secker & Warburg</p>\n')
+  })
+
+  //
+  it('throw an error if regexp has more than 1 parentheses group', () => {
+    const md = MarkdownIt()
+      .use(
+        replacerPlugin()
+          .addRule(/\D(\d+).*(\d+)/m, bold)
+      )
+
+      const t = () => md.render('1984 was published on 8 June 1949 by Secker & Warburg')
+
+      expect(t).toThrow(Error)
+      expect(t).toThrow('The plugin doesn\'t support more than 1 parentheses group in regexp')
+  })
+
+  //
+  it('doesnt interfere with other markdown rules', () => {
+    const md = MarkdownIt()
+      .use(
+        replacerPlugin()
+          .addRule(/\d+/m, bold)
+      )
+
+      const result = md.render('**1984** was *published* on **8 June 1949** by Secker & Warburg')
+
+      expect(result).toEqual('<p><strong><b>1984</b></strong> was <em>published</em> on <strong><b>8</b> June <b>1949</b></strong> by Secker & Warburg</p>\n')
   })
 
   //
