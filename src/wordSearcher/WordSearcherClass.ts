@@ -32,13 +32,22 @@ export class WordSearcher {
         return this
       }
 
+      if (res[2]) {
+        throw new Error('The plugin doesn\'t support more than 1 parentheses group in regexp')
+      }
+
       const foundWord = res[1] || res[0] || ''
+
+      // if regexp was with parentheses res[0] !== res[1]
+      // prefix is the left part of this difference
+      // we need to add the length of this prefix to word position
+      const prefix = res[1] && res[0] !== res[1] ? res[0].split(res[1]).shift() || '' : ''      
 
       this.#results.push({
         content: foundWord,
         position: {
-          start: res.index || 0,
-          end: (res.index || 0) + foundWord.length
+          start: (res.index || 0) + prefix.length,
+          end: (res.index || 0) + prefix.length + foundWord.length
         },
         transform: this.#searchRule!.transform
       })
@@ -91,7 +100,7 @@ export class WordSearcher {
 
   findOne(sortFunction: (word1: Word, word2: Word) => boolean) {
     const results = this.findAll()
-    let result = results.pop()
+    let result = results.shift()
 
     if (!result || results.length === 0) {
       return result || null
