@@ -195,4 +195,17 @@ _They swear_`)
 `
       )
   })
+
+  it('escapes content html tags', () => {
+    const md = MarkdownIt({ html: true })
+      .use(
+        replacerPlugin()
+        .addRule(/\d+/, bold)
+        .addRule(/[<>]/, emphasis)
+      )
+
+    const result = md.render(`25 + 7 > 30, 30 - 7 > 20`)
+
+    expect(result).toEqual('<p><b>25</b> + <b>7</b> <em>&gt;</em> <b>30</b>, <b>30</b> - <b>7</b> <em>&gt;</em> <b>20</b></p>\n')
+  })
 })
