@@ -99,7 +99,6 @@ Francisco: Nay, answer me: stand, and unfold yourself.
 
 Bernardo: Long live the king! Francisco: Bernardo?`
 )
-console.log(result);
       expect(result).toEqual(
 `<p><b>Bernardo</b>: Who's there?</p>
 <p><b>Francisco</b>: Nay, answer me: stand, and unfold yourself.</p>
