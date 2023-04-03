@@ -16,6 +16,10 @@ export class WordSearcher {
     return this
   }
 
+  get rules() {
+    return this.#rules
+  }
+
   #checkParams() {
     if (!this.#searchRule) {
       throw new Error('You forgot to set a search rule. Please do this by calling the method ".setRule()"')
@@ -32,13 +36,20 @@ export class WordSearcher {
         return this
       }
 
+      // if regexp has more than 1 group parentheses
+      // insert matches ahead of the queue
       if (res[2]) {
-        throw new Error('The plugin doesn\'t support more than 1 parentheses group in regexp')
+        Array.from(res.slice(2)).forEach((pattern: string, index: number) => {
+          this.#rules.unshift({
+            pattern,
+            transforms: [this.#searchRule!.transforms[index + 1]]
+          })
+        })
       }
 
       const foundWord = res[1] || res[0] || ''
 
-      // if regexp was with parentheses res[0] !== res[1]
+      // if regexp has group parentheses then res[0] !== res[1]
       // prefix is the left part of this difference
       // we need to add the length of this prefix to word position
       const prefix = res[1] && res[0] !== res[1] ? res[0].split(res[1]).shift() || '' : ''      
@@ -49,7 +60,7 @@ export class WordSearcher {
           start: (res.index || 0) + prefix.length,
           end: (res.index || 0) + prefix.length + foundWord.length
         },
-        transform: this.#searchRule!.transform
+        transform: this.#searchRule!.transforms[0]
       })
     }
     return this
@@ -66,7 +77,7 @@ export class WordSearcher {
         if (found) {
           this.#results.push({
             ...found,
-            transform: this.#searchRule!.transform
+            transform: this.#searchRule!.transforms[0]
           })
         }
       }
@@ -83,7 +94,7 @@ export class WordSearcher {
       if (word) {
         this.#results.push({
           ...word,
-          transform: this.#searchRule!.transform
+          transform: this.#searchRule!.transforms[0]
         })
       }
     }
