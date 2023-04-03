@@ -10,10 +10,14 @@ export default function characterReplacerPlugin() {
     md.renderer.rules['text'] = renderer(rules)
   }
 
-  initializePlugin.addRule = function (pattern: Pattern, transform: RenderFunction) {
+  initializePlugin.addRule = function (pattern: Pattern, ...transforms: RenderFunction[]) {
+    if (transforms.length === 0) {
+      throw new Error('A rule should have at least one transformation.')
+    }
+
     rules.push({
       pattern: checkPattern(pattern),
-      transform
+      transforms
     })
     return this
   }

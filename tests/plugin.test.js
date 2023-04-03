@@ -9,6 +9,10 @@ function emphasis(content) {
   return `<em>${content}</em>`
 }
 
+function remove(content) {
+  return ''
+}
+
 
 describe('the one and only test suite', () => {
   // replaces if search is a regular string
@@ -99,7 +103,6 @@ Francisco: Nay, answer me: stand, and unfold yourself.
 
 Bernardo: Long live the king! Francisco: Bernardo?`
 )
-console.log(result);
       expect(result).toEqual(
 `<p><b>Bernardo</b>: Who's there?</p>
 <p><b>Francisco</b>: Nay, answer me: stand, and unfold yourself.</p>
@@ -122,17 +125,40 @@ console.log(result);
   })
 
   //
-  it('throw an error if regexp has more than 1 parentheses group', () => {
+  it('also works with 2 or more parentheses groups', () => {
     const md = MarkdownIt()
       .use(
         replacerPlugin()
-          .addRule(/\D(\d+).*(\d+)/m, bold)
+          .addRule(/\D(\d+)\D+(\d+)( by.*)$/m, bold, emphasis, remove)
       )
 
-      const t = () => md.render('1984 was published on 8 June 1949 by Secker & Warburg')
+      const result = md.render('1984 was published on 8 June 1949 by Secker & Warburg')
+
+      expect(result).toEqual('<p>1984 was published on <b>8</b> June <em>1949</em></p>\n')
+  })
+
+  // bugfix
+  it('works correctly with * between 2 parentheses groups in regexp', () => {
+    const md = MarkdownIt()
+      .use(
+        replacerPlugin()
+          .addRule(/\D(\d+)\D*(\d+)( by.*)$/m, bold, emphasis, remove)
+      )
+
+      const result = md.render('1984 was published on 8 June 1949 by Secker & Warburg')
+
+      expect(result).toEqual('<p>1984 was published on <b>8</b> June <em>1949</em></p>\n')
+  })
+
+  it('throws an error if a rule have no transformations', () => {
+      const t = () => MarkdownIt()
+        .use(
+          replacerPlugin()
+            .addRule(/\D(\d+)(.*)$/m)
+        )
 
       expect(t).toThrow(Error)
-      expect(t).toThrow('The plugin doesn\'t support more than 1 parentheses group in regexp')
+      expect(t).toThrow('A rule should have at least one transformation.')
   })
 
   //

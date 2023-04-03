@@ -30,6 +30,8 @@ md.use(
 
 ## Examples
 
+***
+
 ### Make all numbers bold:
 
 Input:
@@ -47,8 +49,11 @@ md.render('1984 was published on 8 June 1949 by Secker & Warburg')
 Output:
 
 ```
-<b>1984</b> was published on <b>8</b> June <b>1949</b> by Secker & Warburg
+<p><b>1984</b> was published on <b>8</b> June <b>1949</b> by Secker & Warburg
+</p>
 ```
+
+***
 
 ### Make all numbers bold but match them only if they are in the beginning of the paragraph:
 
@@ -67,5 +72,32 @@ md.render('1984 was published on 8 June 1949 by Secker & Warburg')
 Output:
 
 ```
-<b>1984</b> was published on 8 June 1949 by Secker & Warburg
+<p><b>1984</b> was published on 8 June 1949 by Secker & Warburg
+</p>
+```
+
+***
+
+### Make all numbers bold and non-numbers italic:
+
+Input:
+
+```js
+const bold = s => `<b>${s}</b>`
+const emphasis = s => `<em>${s}</em>`
+
+const md = require('markdown-it')({ html: true })
+  .use(
+    require('@deco313/markdown-it-replace')
+      .addRule(/(\d+)(\D+)/, bold, emphasis)
+  )
+
+md.render('1984 was published on 8 June 1949 by Secker & Warburg')
+```
+
+Output:
+
+```
+<p><b>1984</b><em> was published on </em><b>8</b><em> June </em><b>1949</b><em> by Secker & Warburg</em>
+</p>
 ```

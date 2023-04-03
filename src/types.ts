@@ -4,7 +4,7 @@ export type RenderFunction = (word: string) => string
 
 export interface Rule{
   pattern: Pattern
-  transform: RenderFunction
+  transforms: RenderFunction[]
 }
 
 export interface Word {
