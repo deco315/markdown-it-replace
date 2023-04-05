@@ -1,12 +1,21 @@
-import type { Pattern, Rule, RenderFunction } from './types'
+import type { Pattern, Rule, BlockRule, RenderFunction, Container } from './types'
 import type MarkdownIt from 'markdown-it'
 
 import renderer from "./renderer";
+import * as wrapper from './wrapper'
+
 
 export default function characterReplacerPlugin() {
   const rules = [] as Rule[]
+  const blockRules = [] as BlockRule[]
 
   function initializePlugin(md: MarkdownIt) {
+    blockRules.forEach(blockRule => {      
+      md.inline.ruler.before('text', 'text-replacer', wrapper.replacer(blockRule));
+    })
+    md.renderer.rules['text-replacer-open'] = wrapper.rendererOpen
+    md.renderer.rules['text-replacer-close'] = wrapper.rendererClose
+
     md.renderer.rules['text'] = renderer(rules)
   }
 
@@ -22,6 +31,18 @@ export default function characterReplacerPlugin() {
     return this
   }
 
+  initializePlugin.addBlockRule = function (pattern: Pattern, ...containers: Container[]) {
+    if (containers.length === 0) {
+      throw new Error('A block rule should have at least one container definition.')
+    }
+
+    blockRules.push({
+      pattern: convertToRegexp(pattern),
+      containers
+    })
+    return this
+  }
+
   return initializePlugin
 };
 
@@ -33,4 +54,16 @@ function checkPattern(pattern: Pattern): Pattern {
   }
 
   return pattern
+}
+
+function convertToRegexp(pattern: Pattern): RegExp {
+  if (pattern instanceof RegExp) {
+    return pattern
+  }
+
+  if (Array.isArray(pattern)) {
+    return new RegExp(pattern.join('|'))
+  }
+
+  return new RegExp(pattern)
 }
