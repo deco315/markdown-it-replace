@@ -16,6 +16,7 @@ export function replacer(blockRule: BlockRule) {
     
     const src = state.src.slice(pos)
     const match = src.match(pattern)
+
     if (!match) { return false; }
     if (match.length === 1) {
       match.push(match[0])
@@ -28,7 +29,7 @@ export function replacer(blockRule: BlockRule) {
     if (!silent) {
       let pending = src
       match.slice(1).forEach((m, i) => {
-        const matchPosition = pending.indexOf(m)
+        const matchPosition = pending.indexOf(m, i === 0 ? match.index : 0)
         tagOpened = true
         
         if (matchPosition > 0) {          
