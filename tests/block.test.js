@@ -162,4 +162,20 @@ test 23 4`
 <p>test 23 <em>4</em></p>
 `)
   })
+
+  it('replaces matches with parametrized template tags', () => {
+    const md = MarkdownIt({ html: true })
+      .use(
+        replacerPlugin()
+        .addBlockRule(/\D(\d+)\D+(\d+)( by.*)$/m,
+          { open:`<b data-year="{{ param }}">`, close: '</b>'},
+          { open: '<em>', close: '<span data-year="{{ param }}"></span></em>'},
+          { open: s => `<span data-test="${s.trim()}">`, close: '</span>'}
+        )
+      )
+
+      const result = md.render('1984 was published on 8 June 1949 by Secker & Warburg')
+
+      expect(result).toEqual('<p>1984 was published on <b data-year="8">8</b> June <em>1949<span data-year="1949"></span></em><span data-test="by Secker & Warburg"> by Secker & Warburg</span></p>\n')
+  })
 })

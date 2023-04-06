@@ -17,8 +17,8 @@ export interface Word {
 }
 
 export interface Container {
-  open: string,
-  close: string
+  open: string | RenderFunction,
+  close: string | RenderFunction
 }
 
 export interface BlockRule{

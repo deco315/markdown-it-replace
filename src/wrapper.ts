@@ -1,9 +1,17 @@
 import type Token from 'markdown-it/lib/token'
 import StateInline from 'markdown-it/lib/rules_inline/state_inline'
-import { BlockRule } from './types'
+import { BlockRule, RenderFunction } from './types'
 
 let tagOpened = false
 let firstMatch = true
+
+function renderTag(template: string | RenderFunction, param?: string): string {
+  if (typeof template === 'string') {
+    return template.replace('{{ param }}', param || '')
+  }
+
+  return template(param || '')
+}
 
 export function replacer(blockRule: BlockRule) {
   return (state: StateInline, silent: boolean) => {
@@ -39,7 +47,7 @@ export function replacer(blockRule: BlockRule) {
         // open tag
         const openToken = state.push('text-replacer-open', '', 0)
         openToken.meta = openToken.meta || {}
-        openToken.meta.open = blockRule.containers[i].open
+        openToken.meta.open = renderTag(blockRule.containers[i].open, m)
         
 
         // content
@@ -48,7 +56,7 @@ export function replacer(blockRule: BlockRule) {
         // close tag
         const closeToken = state.push('text-replacer-close', '', 0)
         closeToken.meta = closeToken.meta || {}
-        closeToken.meta.close = blockRule.containers[i].close
+        closeToken.meta.close = renderTag(blockRule.containers[i].close, m)
         tagOpened = false
                 
         pending = pending.slice(matchPosition + m.length)
