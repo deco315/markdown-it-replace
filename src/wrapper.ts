@@ -1,9 +1,7 @@
 import type Token from 'markdown-it/lib/token'
 import StateInline from 'markdown-it/lib/rules_inline/state_inline'
-import { BlockRule, RenderFunction } from './types'
-
-let tagOpened = false
-let firstMatch = true
+import type { BlockRule, RenderFunction } from './types'
+import { createScope } from './utils'
 
 function renderTag(template: string | RenderFunction, param?: string): string {
   if (typeof template === 'string') {
@@ -13,16 +11,22 @@ function renderTag(template: string | RenderFunction, param?: string): string {
   return template(param || '')
 }
 
+const { scope: processTag, insideScope: insideTag } = createScope()
+
 export function replacer(blockRule: BlockRule) {
+  let firstMatch = true
+
   return (state: StateInline, silent: boolean) => {
+    if (insideTag()) {
+      return false
+    }
+
     let pattern = blockRule.pattern
     if (!firstMatch && pattern.source.startsWith('^')) {
       return false
     }
-
-    const pos = state.pos
     
-    const src = state.src.slice(pos)
+    const src = state.src.slice(state.pos)
     const match = src.match(pattern)
 
     if (!match) { return false; }
@@ -30,32 +34,27 @@ export function replacer(blockRule: BlockRule) {
       match.push(match[0])
     }
 
-    if (tagOpened) {
-      return false
-    }
-
     if (!silent) {
       let pending = src
       match.slice(1).forEach((m, i) => {
         const matchPosition = pending.indexOf(m, i === 0 ? match.index : 0)
-        tagOpened = true
-        
-        if (matchPosition > 0) {          
-          tokenize(state, pending.slice(0, matchPosition))
-        }
-        
-        // open tag
-        const openToken = state.push('text-replacer', '', 0)
-        openToken.content = renderTag(blockRule.containers[i].open, m)
 
-        // content
-        tokenize(state, m)
-  
-        // close tag
-        const closeToken = state.push('text-replacer', '', 0)
-        closeToken.content = renderTag(blockRule.containers[i].close, m)
+        processTag(() => {
+          if (matchPosition > 0) {          
+            tokenize(state, pending.slice(0, matchPosition))
+          }
+          
+          // open tag
+          const openToken = state.push('text-replacer', '', 0)
+          openToken.content = renderTag(blockRule.containers[i].open, m)
 
-        tagOpened = false
+          // content
+          tokenize(state, m)
+    
+          // close tag
+          const closeToken = state.push('text-replacer', '', 0)
+          closeToken.content = renderTag(blockRule.containers[i].close, m)
+        })
                 
         pending = pending.slice(matchPosition + m.length)
       })
@@ -67,20 +66,20 @@ export function replacer(blockRule: BlockRule) {
     firstMatch = true
     return true
   }
+
+  function tokenize(state: StateInline, str: string): void {
+    const oldPosMax = state.posMax
+    const oldPos = state.pos
+    state.posMax = state.pos + str.length
+  
+    firstMatch = false
+    state.md.inline.tokenize(state)
+  
+    state.pos = str.length + oldPos
+    state.posMax = oldPosMax
+  }
 }
 
 export function renderer(tokens: Token[], idx: number) {
   return tokens[idx].content
-}
-
-function tokenize(state: StateInline, str: string): void {
-  const oldPosMax = state.posMax
-  const oldPos = state.pos
-  state.posMax = state.pos + str.length
-
-  firstMatch = false
-  state.md.inline.tokenize(state)
-
-  state.pos = str.length + oldPos
-  state.posMax = oldPosMax
 }
