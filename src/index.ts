@@ -13,8 +13,7 @@ export default function characterReplacerPlugin() {
     blockRules.forEach(blockRule => {      
       md.inline.ruler.before('text', 'text-replacer', wrapper.replacer(blockRule));
     })
-    md.renderer.rules['text-replacer-open'] = wrapper.rendererOpen
-    md.renderer.rules['text-replacer-close'] = wrapper.rendererClose
+    md.renderer.rules['text-replacer'] = wrapper.renderer
 
     md.renderer.rules['text'] = renderer(rules)
   }

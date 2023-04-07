@@ -45,18 +45,16 @@ export function replacer(blockRule: BlockRule) {
         }
         
         // open tag
-        const openToken = state.push('text-replacer-open', '', 0)
-        openToken.meta = openToken.meta || {}
-        openToken.meta.open = renderTag(blockRule.containers[i].open, m)
-        
+        const openToken = state.push('text-replacer', '', 0)
+        openToken.content = renderTag(blockRule.containers[i].open, m)
 
         // content
         tokenize(state, m)
   
         // close tag
-        const closeToken = state.push('text-replacer-close', '', 0)
-        closeToken.meta = closeToken.meta || {}
-        closeToken.meta.close = renderTag(blockRule.containers[i].close, m)
+        const closeToken = state.push('text-replacer', '', 0)
+        closeToken.content = renderTag(blockRule.containers[i].close, m)
+
         tagOpened = false
                 
         pending = pending.slice(matchPosition + m.length)
@@ -71,12 +69,8 @@ export function replacer(blockRule: BlockRule) {
   }
 }
 
-export function rendererOpen(tokens: Token[], idx: number) {
-  return tokens[idx].meta.open + tokens[idx].content
-}
-
-export function rendererClose(tokens: Token[], idx: number) {
-  return tokens[idx].meta.close
+export function renderer(tokens: Token[], idx: number) {
+  return tokens[idx].content
 }
 
 function tokenize(state: StateInline, str: string): void {
