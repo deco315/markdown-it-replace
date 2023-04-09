@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0]
+
+### Added
+
+- *block rules* - rules that apply to markdown source code (unlike inline rules that apply to parsed pieces of text)
+
+  They let you wrap parts of markdown code in html tags
+
 ## [1.1.2]
 
 ### Added
