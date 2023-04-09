@@ -15,13 +15,13 @@ const { scope: processTag, insideScope: insideTag } = createScope()
 
 export function replacer(blockRule: BlockRule) {
   let firstMatch = true
+  const pattern = blockRule.pattern
 
   return (state: StateInline, silent: boolean) => {
     if (insideTag()) {
       return false
     }
 
-    let pattern = blockRule.pattern
     if (!firstMatch && pattern.source.startsWith('^')) {
       return false
     }
