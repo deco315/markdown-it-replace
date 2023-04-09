@@ -15,3 +15,13 @@ export interface Word {
   },
   transform: RenderFunction
 }
+
+export interface Container {
+  open: string | RenderFunction,
+  close: string | RenderFunction
+}
+
+export interface BlockRule{
+  pattern: RegExp
+  containers: Container[]
+}

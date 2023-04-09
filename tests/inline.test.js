@@ -14,7 +14,7 @@ function remove(content) {
 }
 
 
-describe('the one and only test suite', () => {
+describe('test inline replacer', () => {
   // replaces if search is a regular string
   it('replaces if search is a regular string', () => {
     const md = MarkdownIt()
